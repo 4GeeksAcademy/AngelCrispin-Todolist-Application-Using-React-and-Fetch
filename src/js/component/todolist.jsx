@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react';
 
-let cont=0;
+let nameUser = "AngelCrispin";
 
 export default function ToDoList () {
     const [inputValue, setInputValue ] = useState('');
@@ -10,55 +10,54 @@ export default function ToDoList () {
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
           if(inputValue.trim() !== "") {
-            //let todo = [...allTodos];
-            //todo.push({id:cont,label:inputValue});
             let todo = {label:inputValue,is_done:false};
             createTodo(todo)
           }
         }
-      }
+    }
       
-
-    // const deleteToDo = (index) => {
-    //   let todoAux = [];
-    //   allTodos.map((item)=>{ 
-    //     if(item.id!=index){
-    //       todoAux.push(item);
-    //     }
-    //   })  
-    //   setAllTodos(todoAux);
-    // }
-
-
-    
   useEffect(() => {
     getTodos();
   }, []);
 
 
+  const createUser = () => {
+    fetch(`https://playground.4geeks.com/todo/users/${nameUser}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(resp => {
+        if(resp.status==201){
+          getTodos();
+        }
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
+  }
   
   const getTodos = () => {
 
-    fetch('https://playground.4geeks.com/todo/users/AngelCrispin', {
+    fetch(`https://playground.4geeks.com/todo/users/${nameUser}`, {
         method: "GET",
-        //body: JSON.stringify(todos),
         headers: {
           "Content-Type": "application/json"
         }
       })
       .then(resp => {
-          console.log(resp.ok); // Será true si la respuesta es exitosa
-          console.log(resp.status); // El código de estado 200, 300, 400, etc.
-          //console.log(resp.text()); // Intentará devolver el resultado exacto como string
-          return resp.json(); // Intentará parsear el resultado a JSON y retornará una promesa donde puedes usar .then para seguir con la lógica
+          if(resp.status==200){
+            return resp.json();
+          } else {
+            createUser();
+          }
       })
       .then(data => {
-          // Aquí es donde debe comenzar tu código después de que finalice la búsqueda
-          console.log(data); // Esto imprimirá en la consola el objeto exacto recibido del servidor
           setAllTodos(data.todos)
       })
       .catch(error => {
-          // Manejo de errores
           console.log(error);
       });
 
@@ -67,7 +66,7 @@ export default function ToDoList () {
 
   const createTodo = (todo) => {
 
-    fetch('https://playground.4geeks.com/todo/todos/AngelCrispin', {
+    fetch(`https://playground.4geeks.com/todo/todos/${nameUser}`, {
         method: "POST",
         body: JSON.stringify(todo),
         headers: {
@@ -75,18 +74,9 @@ export default function ToDoList () {
         }
       })
       .then(resp => {
-          console.log(resp.ok); // Será true si la respuesta es exitosa
-          console.log(resp.status); // El código de estado 200, 300, 400, etc.
-          //console.log(resp.text()); // Intentará devolver el resultado exacto como string
-          return resp.json(); // Intentará parsear el resultado a JSON y retornará una promesa donde puedes usar .then para seguir con la lógica
-      })
-      .then(data => {
-          // Aquí es donde debe comenzar tu código después de que finalice la búsqueda
-          console.log(data); // Esto imprimirá en la consola el objeto exacto recibido del servidor
-          getTodos();
+        getTodos();
       })
       .catch(error => {
-          // Manejo de errores
           console.log(error);
       });
 
@@ -95,7 +85,7 @@ export default function ToDoList () {
 
 
   const deleteTodo = (id) => {
-    console.log(id)
+
     fetch(`https://playground.4geeks.com/todo/todos/${id}`, {
         method: "DELETE",
         body: JSON.stringify(id),
@@ -104,18 +94,9 @@ export default function ToDoList () {
         }
       })
       .then(resp => {
-          console.log(resp.ok); // Será true si la respuesta es exitosa
-          console.log(resp.status); // El código de estado 200, 300, 400, etc.
-          //console.log(resp.text()); // Intentará devolver el resultado exacto como string
-          //return resp.json(); // Intentará parsear el resultado a JSON y retornará una promesa donde puedes usar .then para seguir con la lógica
-      })
-      .then(data => {
-          // Aquí es donde debe comenzar tu código después de que finalice la búsqueda
-          //console.log(data); // Esto imprimirá en la consola el objeto exacto recibido del servidor
-          getTodos();
+        getTodos();
       })
       .catch(error => {
-          // Manejo de errores
           console.log(error);
       });
 
